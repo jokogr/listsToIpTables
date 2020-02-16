@@ -1,5 +1,5 @@
 { mkDerivation, base, bytestring, HTTP, iproute, network-uri
-, stdenv, zlib
+, stdenv, typed-process, zlib
 }:
 mkDerivation {
   pname = "ListsToIpTables";
@@ -8,7 +8,7 @@ mkDerivation {
   isLibrary = false;
   isExecutable = true;
   executableHaskellDepends = [
-    base bytestring HTTP iproute network-uri zlib
+    base bytestring HTTP iproute network-uri typed-process zlib
   ];
   description = "Download IP lists and transform them to IP sets";
   license = stdenv.lib.licenses.gpl3;
