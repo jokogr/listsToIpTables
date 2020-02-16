@@ -12,5 +12,10 @@ extra-source-files:  CHANGELOG.md, README.md
 
 executable ListsToIpTables
   main-is:             Main.hs
-  build-depends:       base >=4.12 && <4.13
+  build-depends:       base >=4.12 && <4.13,
+                       bytestring,
+                       HTTP,
+                       iproute,
+                       network-uri,
+                       zlib
   default-language:    Haskell2010
