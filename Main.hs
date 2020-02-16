@@ -48,23 +48,27 @@ data BlockRecord = BlockRecord
                    } deriving (Show)
 
 
+breakOnLast :: (Char -> Bool) -> String -> (String, String)
+breakOnLast f s = let p = break f (reverse s)
+                  in (reverse . snd $ p, reverse . fst $ p)
+
 parseBlockString :: String -> [BlockRecord]
 parseBlockString blockStr =
   map toBlockRecord $
         filter (\ln -> not . null $ ln) $ 
-          tail . init . lines $ blockStr
+          tail . lines $ blockStr
   where
     
     toBlockRecord line =
-       case break (\c -> c == ':') line of
+       case breakOnLast (\c -> c == ':') line of
          ([],_) -> error $ "No description in entry '" ++ line ++ "'."  
-         (descr, ipRangeWithDots) ->
+         (descr, ipRangeStr) ->
             BlockRecord{ description = descr
                        , startIP = fst ips
                        , endIP = snd ips
                        }
             where
-              ips = ipRangeToIPs $ drop 1 ipRangeWithDots
+              ips = ipRangeToIPs ipRangeStr
 
 
 ipRangeToIPs :: String -> (IPv4, IPv4)
