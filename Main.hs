@@ -4,10 +4,9 @@ module Main where
 
 import Network.HTTP
 import Network.URI
---import qualified Data.ByteString.Lazy as LBS
 import qualified Data.ByteString.Lazy.Char8 as LC
 import Codec.Compression.GZip (decompress)
-
+import Data.IP
 
 aUrlStr :: String
 aUrlStr = "http://list.iblocklist.com/?list=ydxerpxkpcfqjaybcssw&fileformat=p2p&archiveformat=gz"
@@ -42,9 +41,44 @@ downLoadFile urlStr =
 decompressString :: String -> String
 decompressString = LC.unpack . decompress . LC.pack
 
+data BlockRecord = BlockRecord
+                   { description :: String
+                   , startIP :: IPv4 
+                   , endIP  :: IPv4
+                   } deriving (Show)
+
+
+parseBlockString :: String -> [BlockRecord]
+parseBlockString blockStr =
+  map toBlockRecord $
+        filter (\ln -> not . null $ ln) $ 
+          tail . init . lines $ blockStr
+  where
+    
+    toBlockRecord line =
+       case break (\c -> c == ':') line of
+         ([],_) -> error $ "No description in entry '" ++ line ++ "'."  
+         (descr, ipRangeWithDots) ->
+            BlockRecord{ description = descr
+                       , startIP = fst ips
+                       , endIP = snd ips
+                       }
+            where
+              ips = ipRangeToIPs $ drop 1 ipRangeWithDots
+
+
+ipRangeToIPs :: String -> (IPv4, IPv4)
+ipRangeToIPs r = 
+   case break (\c -> c == '-') r of
+     ([], _) -> error "expecting -"
+     (ip1, ip2WithMinus) -> (strToIP ip1 , strToIP $ drop 1 ip2WithMinus)
+      where strToIP s = (read s :: IPv4)
+
+       
+
 main :: IO ()
 main = 
    do gagarinString <- downLoadFile aUrlStr
-      putStrLn $ decompressString gagarinString
+      mapM_ (putStrLn . show) $ parseBlockString $ decompressString gagarinString
       putStrLn "finito la musica, pasato la fiesta"
 
