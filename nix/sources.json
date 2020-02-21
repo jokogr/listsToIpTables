@@ -22,5 +22,17 @@
         "type": "tarball",
         "url": "https://github.com/NixOS/nixpkgs-channels/archive/8731aaaf8b30888bc24994096db830993090d7c4.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "ormolu": {
+        "branch": "master",
+        "description": "A formatter for Haskell source code",
+        "homepage": null,
+        "owner": "tweag",
+        "repo": "ormolu",
+        "rev": "55d8b7f8c482655ea575425e55352e650f304ea0",
+        "sha256": "056sglg66v16ckilcsyc8p9w348spchilhwxh490jwcm01c50gz3",
+        "type": "tarball",
+        "url": "https://github.com/tweag/ormolu/archive/55d8b7f8c482655ea575425e55352e650f304ea0.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }

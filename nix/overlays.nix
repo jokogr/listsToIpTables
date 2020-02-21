@@ -20,4 +20,9 @@
           );
     }
   )
+  (
+    _: super: {
+      ormolu = (import sources.ormolu {}).ormolu;
+    }
+  )
 ]
