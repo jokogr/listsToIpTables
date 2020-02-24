@@ -99,7 +99,7 @@ main =
           do
             hPutStrLn
               h
-              "create iblocklist-level1 hash:ip family inet hashsize 260000 maxelem 262143"
+              "create iblocklist-level1 hash:net family inet hashsize 262144 maxelem 524287"
             mapM_
               ( \rec ->
                   hPutStrLn h $
