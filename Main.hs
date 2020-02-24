@@ -7,7 +7,8 @@ import qualified Data.ByteString.Lazy.Char8 as LC
 import Data.IP
 import Network.HTTP
 import Network.URI
-import System.Process.Typed
+--import System.Process.Typed
+import System.IO
 
 aUrlStr :: String
 aUrlStr = "http://list.iblocklist.com/?list=ydxerpxkpcfqjaybcssw&fileformat=p2p&archiveformat=gz"
@@ -88,7 +89,20 @@ main :: IO ()
 main =
   do
     gagarinString <- downLoadFile aUrlStr
-    runProcess_ "ipset create iblocklist-level1 hash:ip"
+    --runProcess_ "ipset create iblocklist-level1 hash:ip"
     let blockList = parseBlockString $ decompressString gagarinString
-    mapM_ (\record -> runProcess_ $ shell $ "ipset add iblocklist-level1 " ++ (show $ startIP record) ++ " -exist") blockList
+    --mapM_ (\record -> runProcess_ $ shell $ "ipset add iblocklist-level1 " ++ (show $ startIP record) ++ " -exist") blockList
+
+    --mapM_ (putStrLn . show . (\(i,rec) -> (i, startIP rec))) (zip [1..] blockList)
+    withFile "trololo.lst" WriteMode $ 
+       (\h -> 
+         do hPutStrLn h 
+              "create iblocklist-level1 hash:ip family inet hashsize 260000 maxelem 262143"
+            mapM_ (\rec -> 
+                      hPutStrLn h $ "add iblocklist-level1 " ++ 
+                                    (show $ startIP rec) ++ "-" ++  
+                                    (show $ endIP rec))
+                  blockList
+
+       )
     putStrLn "finito la musica, pasato la fiesta"
