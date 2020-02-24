@@ -10,6 +10,7 @@ import Network.URI
 import System.Process
 --import System.Process.Typed
 import System.IO
+import Data.Maybe
 
 aUrlStr :: String
 aUrlStr = "http://list.iblocklist.com/?list=ydxerpxkpcfqjaybcssw&fileformat=p2p&archiveformat=gz"
@@ -95,35 +96,22 @@ main =
     --mapM_ (\record -> runProcess_ $ shell $ "ipset add iblocklist-level1 " ++ (show $ startIP record) ++ " -exist") blockList
 
     --mapM_ (putStrLn . show . (\(i,rec) -> (i, startIP rec))) (zip [1..] blockList)
-    {-withFile "trololo.lst" WriteMode $
-      ( \h ->
+    withCreateProcess (proc "ipset" ["restore", "-!"]){ std_in = CreatePipe } $
+      ( \h stdout stderr ph->
           do
             hPutStrLn
-              h
+              (fromJust h)
               "create iblocklist-level1 hash:net family inet hashsize 262144 maxelem 524287"
             mapM_
               ( \rec ->
-                  hPutStrLn h $
+                  hPutStrLn (fromJust h) $
                     "add iblocklist-level1 "
                       ++ (show $ startIP rec)
                       ++ "-"
                       ++ (show $ endIP rec)
               )
               blockList
-      )-}
-    --ipset restore -! < trololo.lst
-    (Just hin, _, _, procHandle) <-
-       createProcess (proc "ipset restore -!" []){ std_in = CreatePipe }
-    hPutStrLn hin
-      "create iblocklist-level1 hash:net family inet hashsize 262144 maxelem 524287"
-    mapM_
-      ( \rec ->
-          hPutStrLn hin $
-            "add iblocklist-level1 "
-              ++ (show $ startIP rec)
-              ++ "-"
-              ++ (show $ endIP rec)
       )
-      blockList
+    --ipset restore -! < trololo.lst
     
     putStrLn "finito la musica, pasato la fiesta"
