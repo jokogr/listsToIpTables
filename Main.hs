@@ -7,6 +7,7 @@ import qualified Data.ByteString.Lazy.Char8 as LC
 import Data.IP
 import Network.HTTP
 import Network.URI
+import System.Process
 --import System.Process.Typed
 import System.IO
 
@@ -94,7 +95,7 @@ main =
     --mapM_ (\record -> runProcess_ $ shell $ "ipset add iblocklist-level1 " ++ (show $ startIP record) ++ " -exist") blockList
 
     --mapM_ (putStrLn . show . (\(i,rec) -> (i, startIP rec))) (zip [1..] blockList)
-    withFile "trololo.lst" WriteMode $
+    {-withFile "trololo.lst" WriteMode $
       ( \h ->
           do
             hPutStrLn
@@ -109,5 +110,20 @@ main =
                       ++ (show $ endIP rec)
               )
               blockList
+      )-}
+    --ipset restore -! < trololo.lst
+    (Just hin, _, _, procHandle) <-
+       createProcess (proc "ipset restore -!" []){ std_in = CreatePipe }
+    hPutStrLn hin
+      "create iblocklist-level1 hash:net family inet hashsize 262144 maxelem 524287"
+    mapM_
+      ( \rec ->
+          hPutStrLn hin $
+            "add iblocklist-level1 "
+              ++ (show $ startIP rec)
+              ++ "-"
+              ++ (show $ endIP rec)
       )
+      blockList
+    
     putStrLn "finito la musica, pasato la fiesta"
