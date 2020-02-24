@@ -94,15 +94,20 @@ main =
     --mapM_ (\record -> runProcess_ $ shell $ "ipset add iblocklist-level1 " ++ (show $ startIP record) ++ " -exist") blockList
 
     --mapM_ (putStrLn . show . (\(i,rec) -> (i, startIP rec))) (zip [1..] blockList)
-    withFile "trololo.lst" WriteMode $ 
-       (\h -> 
-         do hPutStrLn h 
+    withFile "trololo.lst" WriteMode $
+      ( \h ->
+          do
+            hPutStrLn
+              h
               "create iblocklist-level1 hash:ip family inet hashsize 260000 maxelem 262143"
-            mapM_ (\rec -> 
-                      hPutStrLn h $ "add iblocklist-level1 " ++ 
-                                    (show $ startIP rec) ++ "-" ++  
-                                    (show $ endIP rec))
-                  blockList
-
-       )
+            mapM_
+              ( \rec ->
+                  hPutStrLn h $
+                    "add iblocklist-level1 "
+                      ++ (show $ startIP rec)
+                      ++ "-"
+                      ++ (show $ endIP rec)
+              )
+              blockList
+      )
     putStrLn "finito la musica, pasato la fiesta"
