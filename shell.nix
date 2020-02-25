@@ -4,5 +4,5 @@ in pkgs.haskellPackages.shellFor
   {
     packages = p: [ p.listsToIpTables ];
     withHoogle = false;
-    buildInputs = [ pkgs.cabal-install pkgs.niv pkgs.ormolu ];
+    buildInputs = [ pkgs.cabal-install pkgs.ipset pkgs.niv pkgs.ormolu ];
   }
