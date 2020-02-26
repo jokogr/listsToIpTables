@@ -11,9 +11,6 @@ import Network.URI
 import System.IO
 import System.Process
 
-aUrlStr :: String
-aUrlStr = "http://list.iblocklist.com/?list=ydxerpxkpcfqjaybcssw&fileformat=p2p&archiveformat=gz"
-
 downLoadFile :: String -> IO String --It would be better if this returned Lazy ByteString
 downLoadFile urlStr =
   do
@@ -113,8 +110,17 @@ createIPsetFromBlockList listName listURL =
               blockList
       )
 
+data BlockList = BlockList {blockListName :: String, blockListURL :: String}
+
+blockLists :: [BlockList]
+blockLists =
+  [ BlockList "iblocklist-level1" "http://list.iblocklist.com/?list=ydxerpxkpcfqjaybcssw&fileformat=p2p&archiveformat=gz",
+    BlockList "iblocklist-level2" "http://list.iblocklist.com/?list=gyisgnzbhppbvsphucsw&fileformat=p2p&archiveformat=gz",
+    BlockList "iblocklist-level3" "http://list.iblocklist.com/?list=uwnukjqktoggdknzrhgh&fileformat=p2p&archiveformat=gz"
+  ]
+
 main :: IO ()
 main =
   do
-    createIPsetFromBlockList "iblocklist-level1" aUrlStr
+    mapM_ (\list -> createIPsetFromBlockList (blockListName list) (blockListURL list)) blockLists
     putStrLn "finito la musica, pasato la fiesta"
