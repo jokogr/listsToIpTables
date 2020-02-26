@@ -5,11 +5,11 @@ module Main where
 import Codec.Compression.GZip (decompress)
 import qualified Data.ByteString.Lazy.Char8 as LC
 import Data.IP
+import Data.Maybe
 import Network.HTTP
 import Network.URI
-import System.Process
 import System.IO
-import Data.Maybe
+import System.Process
 
 aUrlStr :: String
 aUrlStr = "http://list.iblocklist.com/?list=ydxerpxkpcfqjaybcssw&fileformat=p2p&archiveformat=gz"
@@ -91,8 +91,8 @@ main =
   do
     gagarinString <- downLoadFile aUrlStr
     let blockList = parseBlockString $ decompressString gagarinString
-    withCreateProcess (proc "ipset" ["restore", "-!"]){ std_in = CreatePipe } $
-      ( \h stdout stderr ph->
+    withCreateProcess (proc "ipset" ["restore", "-!"]) {std_in = CreatePipe} $
+      ( \h stdout stderr ph ->
           do
             hPutStrLn
               (fromJust h)
