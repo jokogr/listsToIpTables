@@ -8,7 +8,6 @@ import Data.IP
 import Network.HTTP
 import Network.URI
 import System.Process
---import System.Process.Typed
 import System.IO
 import Data.Maybe
 
@@ -91,11 +90,7 @@ main :: IO ()
 main =
   do
     gagarinString <- downLoadFile aUrlStr
-    --runProcess_ "ipset create iblocklist-level1 hash:ip"
     let blockList = parseBlockString $ decompressString gagarinString
-    --mapM_ (\record -> runProcess_ $ shell $ "ipset add iblocklist-level1 " ++ (show $ startIP record) ++ " -exist") blockList
-
-    --mapM_ (putStrLn . show . (\(i,rec) -> (i, startIP rec))) (zip [1..] blockList)
     withCreateProcess (proc "ipset" ["restore", "-!"]){ std_in = CreatePipe } $
       ( \h stdout stderr ph->
           do
@@ -112,6 +107,4 @@ main =
               )
               blockList
       )
-    --ipset restore -! < trololo.lst
-    
     putStrLn "finito la musica, pasato la fiesta"
