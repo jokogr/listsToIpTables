@@ -86,25 +86,35 @@ ipRangeToIPs r =
       where
         strToIP s = (read s :: IPv4)
 
-main :: IO ()
-main =
+createIPsetFromBlockList :: String -> String -> IO ()
+createIPsetFromBlockList listName listURL =
   do
-    gagarinString <- downLoadFile aUrlStr
-    let blockList = parseBlockString $ decompressString gagarinString
+    blockListString <- downLoadFile listURL
+    let blockList = parseBlockString $ decompressString blockListString
     withCreateProcess (proc "ipset" ["restore", "-!"]) {std_in = CreatePipe} $
       ( \h stdout stderr ph ->
           do
             hPutStrLn
               (fromJust h)
-              "create iblocklist-level1 hash:net family inet hashsize 262144 maxelem 524287"
+              ( "create "
+                  ++ listName
+                  ++ " hash:net family inet hashsize 262144 maxelem 524287"
+              )
             mapM_
               ( \rec ->
                   hPutStrLn (fromJust h) $
-                    "add iblocklist-level1 "
+                    "add "
+                      ++ listName
+                      ++ " "
                       ++ (show $ startIP rec)
                       ++ "-"
                       ++ (show $ endIP rec)
               )
               blockList
       )
+
+main :: IO ()
+main =
+  do
+    createIPsetFromBlockList "iblocklist-level1" aUrlStr
     putStrLn "finito la musica, pasato la fiesta"
